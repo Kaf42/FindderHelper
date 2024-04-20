@@ -91,7 +91,7 @@ def CreateChromeDriver(headless=False):
     options.add_argument('--proxy-server=%s' % proxy_ip)
     # 指定chrome的路径
     options.binary_location = chrome_address
-    service = Service(executable_path=chromedrive_address)
+    service = Service(chromedrive_address)
     # 创建浏览器对象
     browser = webdriver.Chrome(service=service, options=options)
     # 破解反爬措施
@@ -102,6 +102,6 @@ def CreateChromeDriver(headless=False):
     return browser
 
 
-# if __name__ == "__main__":
-#     UrlSniffing(target_url)
-#     # ClearProxyAndChrome()
+if __name__ == "__main__":
+    UrlSniffing(target_url)
+    # ClearProxyAndChrome()
