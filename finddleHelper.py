@@ -1,7 +1,7 @@
 import logging
 
 import PyQt5.QtGui as QtGui
-from PyQt5.QtWidgets import QMainWindow, QHeaderView, QAbstractItemView
+from PyQt5.QtWidgets import QMainWindow, QAbstractItemView
 
 from mainwindow import Ui_FinddleHelper
 from thread import Thread_Copy, Thread_Sniffer
@@ -27,7 +27,7 @@ class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
         font.setBold(True)
         self.tableWidget.horizontalHeader().setFont(font)
         # 手动设置列宽
-        self.tableWidget.horizontalHeader().resizeSection(0, 500)
+        self.tableWidget.horizontalHeader().resizeSection(0, 470)
         self.tableWidget.horizontalHeader().resizeSection(1, 50)
         self.tableWidget.horizontalHeader().resizeSection(2, 50)
         # 设置列宽自适应

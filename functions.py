@@ -5,18 +5,20 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.remote.command import Command
+from configparser import ConfigParser
 
 target_url = "https://www.imf.org"
 time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-proxyRule = "proxy_rule.py"
-chrome_address = r"D:\chrome-win64\chrome.exe"  # 浏览器位置
-chromedrive_address = r"D:\chrome-win64\chromedriver.exe"  # 驱动位置
+config = ConfigParser()
+config.read('config.ini')
+chrome_address = config['Chrome']['chrome_path']
+chromedrive_address = config['Chrome']['chromedriver_path']
 
 
 def UrlSniffing(url):
     ClearProxyAndChrome()
     # 1.开启代理
-    command = "mitmdump -w mitmFile.txt -s " + proxyRule
+    command = "mitmdump -w mitmFile.txt -s proxy_rule.py"
     os.system("start cmd.exe cmd /k " + command)
 
     # 2.打开浏览器
