@@ -1,5 +1,7 @@
-from mitmproxy import ctx
 import os
+
+from mitmproxy import ctx
+
 
 # 所有发出的请求数据包都会被这个方法所处理,这里只是打印一下一些项；当然可以修改这些项的值直接给这些项赋值即可
 def request(flow):

@@ -2,7 +2,6 @@ import os
 import re
 import shutil
 import time
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.remote.command import Command
@@ -15,6 +14,7 @@ chromedrive_address = r"D:\chrome-win64\chromedriver.exe"  # 驱动位置
 
 
 def UrlSniffing(url):
+    ClearProxyAndChrome()
     # 1.开启代理
     command = "mitmdump -w mitmFile.txt -s " + proxyRule
     os.system("start cmd.exe cmd /k " + command)
@@ -25,15 +25,12 @@ def UrlSniffing(url):
 
     try:
         while True:
-            if driver.execute(Command.GET_TITLE)['value'] == None:
+            if driver.execute(Command.GET_TITLE)['value'] is None:
                 break
     except:
         pass
+    ClearProxyAndChrome()
     print("浏览器已关闭！进行后续处理。")
-    # 关闭相关进程
-    os.system('taskkill /im WindowsTerminal.exe /F')
-    os.system('taskkill /im chromedriver.exe /F')
-    os.system('taskkill /im chrome.exe /F')
 
     # 3.处理中间文件
     # 读取数据
@@ -52,10 +49,20 @@ def UrlSniffing(url):
             re_urls.append(re_url)
 
     # 4.写入结果文件
-    with open("result_" + time_stamp + ".txt", "w") as f:
+    with open("./tmp/result_" + time_stamp + ".txt", "w") as f:
         for url in re_urls:
             f.write(url + "\n")
+    re_urls = str(re_urls)[2:-2].replace("', '", "\n")
+    # print(re_urls)
     return re_urls
+
+
+def ClearProxyAndChrome():
+    # 关闭相关进程
+    os.system("taskkill /f /im cmd.exe")
+    os.system("taskkill /f /im WindowsTerminal.exe")
+    os.system("taskkill /f /im chrome.exe")
+    os.system("taskkill /f /im chromedriver.exe")
 
 
 def CreateChromeDriver(headless=False):
@@ -93,5 +100,6 @@ def CreateChromeDriver(headless=False):
     return browser
 
 
-if __name__ == "__main__":
-    url_sniffing(target_url)
+# if __name__ == "__main__":
+#     UrlSniffing(target_url)
+#     # ClearProxyAndChrome()

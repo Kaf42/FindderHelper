@@ -1,19 +1,20 @@
-from PyQt5.QtWidgets import QMainWindow, QHeaderView, QAbstractItemView
-import PyQt5.QtGui as QtGui
 import logging
-import win32clipboard as wcb
-import win32con as wc
+
+import PyQt5.QtGui as QtGui
+from PyQt5.QtWidgets import QMainWindow, QHeaderView, QAbstractItemView
 
 from mainwindow import Ui_FinddleHelper
-from functions import UrlSniffing
+from thread import Thread_Copy, Thread_Sniffer
 
-logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
+                    level=logging.DEBUG)
 
 
-class FinddleHelper(QMainWindow, Ui_FinddleHelper):
+class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
     def __init__(self, parent=None):
-        super(FinddleHelper, self).__init__(parent)
+        super(Finddle_Helper, self).__init__(parent)
         self.InitUI()
+        self.urls = "www.baidu.com;\nwww.baidu.com111"
 
     def InitUI(self):
         self.setupUi(self)
@@ -26,19 +27,16 @@ class FinddleHelper(QMainWindow, Ui_FinddleHelper):
         font.setBold(True)
         self.tableWidget.horizontalHeader().setFont(font)
         # 手动设置列宽
-        # self.tableWidget.horizontalHeader().resizeSection(0, 100)
-        # self.tableWidget.horizontalHeader().resizeSection(1, 100)
-        # self.tableWidget.horizontalHeader().resizeSection(2, 400)
+        self.tableWidget.horizontalHeader().resizeSection(0, 400)
+        self.tableWidget.horizontalHeader().resizeSection(1, 100)
+        self.tableWidget.horizontalHeader().resizeSection(2, 100)
         # 设置列宽自适应
-        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         # 绑定按钮与信号槽
         self.button_start.clicked.connect(self.ButtonStartClicked)
         self.button_copy.clicked.connect(self.ButtonCopyClicked)
         self.button_reset.clicked.connect(self.ButtonResetClicked)
-
-        self.urls = "1111111111"
-
 
     def ButtonStartClicked(self):
         """
@@ -51,17 +49,22 @@ class FinddleHelper(QMainWindow, Ui_FinddleHelper):
         if target_url == "":
             logging.info("url为空！")
             return
-        logging.info("url为："+target_url)
+        logging.info("url为：" + target_url)
         logging.info("开始进行抓包！")
-        # 网址嗅探
-        urls = UrlSniffing(target_url)
-        logging.info("抓包完成！")
-        # 网址写入
-        for url in urls:
-            self.tableInsert(url, 'Get', '200')
-        logging.info("插入完成！")
-        self.urls = str(urls)
-        logging.info(self.urls)
+
+        self.button_start.setEnabled(False)
+        try:
+            self.thread_start = Thread_Sniffer(target_url, self.tableWidget)
+            self.thread_start.finishSignal.connect(lambda: self.button_start.setEnabled(True))
+            self.thread_start.urlsSignal.connect(lambda: self.button_start.setEnabled(True))
+            self.thread_start.urlsSignal.connect(self.set_urls)
+            self.thread_start.start()
+            logging.info(self.urls)
+        except Exception as e:
+            print(e)
+
+    def set_urls(self, urls):
+        self.urls = urls
 
     def tableInsert(self, url, type, status):
         """
@@ -75,19 +78,14 @@ class FinddleHelper(QMainWindow, Ui_FinddleHelper):
         self.tableWidget.insertRow(self.tableWidget.rowCount(), 1, type)
         self.tableWidget.insertRow(self.tableWidget.rowCount(), 1, status)
 
-
     def ButtonCopyClicked(self):
         """
         复制按钮功能实现
         :return:
         """
-        logging.info("copy clicked")
-        # 复制至剪切板
-        wcb.OpenClipboard() # 打开剪切板
-        wcb.EmptyClipboard()    # 清空剪切板
-        wcb.SetClipboardData(wc.CF_TEXT, self.urls.encode('gbk'))   # 写入剪贴板
-        wcb.CloseClipboard()    # 关闭剪切板
-
+        logging.info("copy clicked!")
+        self.thread_copy = Thread_Copy(self.urls)  # 创建线程
+        self.thread_copy.start()
 
     def ButtonResetClicked(self):
         """
@@ -96,5 +94,6 @@ class FinddleHelper(QMainWindow, Ui_FinddleHelper):
         """
         logging.info("reset clicked")
         self.urls = ""
+        self.lineEdit.clear()
         while self.tableWidget.rowCount() > 0:
             self.tableWidget.removeRow(0)
