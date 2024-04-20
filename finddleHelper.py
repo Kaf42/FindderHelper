@@ -1,7 +1,11 @@
 import logging
 
+import PyQt5
 import PyQt5.QtGui as QtGui
+from IPython.external.qt_for_kernel import QtCore
 from PyQt5.QtWidgets import QMainWindow, QAbstractItemView
+
+from configparser import ConfigParser
 
 from mainwindow import Ui_FinddleHelper
 from thread import Thread_Copy, Thread_Sniffer
@@ -9,12 +13,15 @@ from thread import Thread_Copy, Thread_Sniffer
 logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
                     level=logging.DEBUG)
 
+config = ConfigParser()
+config.read('config.ini')
+backgrond_path = config['DEFAULT']['background']
 
 class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
     def __init__(self, parent=None):
         super(Finddle_Helper, self).__init__(parent)
         self.InitUI()
-        self.urls = "www.baidu.com;\nwww.baidu.com111"
+        self.urls = ""
 
     def InitUI(self):
         self.setupUi(self)
@@ -29,7 +36,7 @@ class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
         # 手动设置列宽
         self.tableWidget.horizontalHeader().resizeSection(0, 470)
         self.tableWidget.horizontalHeader().resizeSection(1, 50)
-        self.tableWidget.horizontalHeader().resizeSection(2, 50)
+        self.tableWidget.horizontalHeader().resizeSection(2, 88)
         # 设置列宽自适应
         # self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
@@ -37,6 +44,23 @@ class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
         self.button_start.clicked.connect(self.ButtonStartClicked)
         self.button_copy.clicked.connect(self.ButtonCopyClicked)
         self.button_reset.clicked.connect(self.ButtonResetClicked)
+
+        try:
+            # 设置背景
+            pixmap = QtGui.QPixmap(backgrond_path)
+            pixmap = pixmap.scaled(self.width(), self.height())
+            palette = QtGui.QPalette()
+            palette.setBrush(QtGui.QPalette.Window, QtGui.QBrush(pixmap))
+            self.setPalette(palette)
+        except Exception as e:
+            logging.error("设置背景图片 "+backgrond_path+" 失败，路径为： "+str(e))
+        # self.setWindowOpacity(0.7)
+        # 设置组件透明度以显现背景
+        # pal = self.tableWidget.viewport().palette()
+        # pal.setColor(QtGui.QPalette.Base, QtGui.QColor(0, 0, 0, 0))
+        # self.tableWidget.viewport().setPalette(pal)
+        # self.tableWidget.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+
 
     def ButtonStartClicked(self):
         """
@@ -65,18 +89,6 @@ class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
 
     def set_urls(self, urls):
         self.urls = urls
-
-    def tableInsert(self, url, type, status):
-        """
-        表格数据插入
-        :param url:网址
-        :param type: 类型
-        :param status: 状态
-        :return:
-        """
-        self.tableWidget.insertRow(self.tableWidget.rowCount(), 1, url)
-        self.tableWidget.insertRow(self.tableWidget.rowCount(), 1, type)
-        self.tableWidget.insertRow(self.tableWidget.rowCount(), 1, status)
 
     def ButtonCopyClicked(self):
         """
