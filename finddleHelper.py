@@ -27,9 +27,9 @@ class Finddle_Helper(QMainWindow, Ui_FinddleHelper):
         font.setBold(True)
         self.tableWidget.horizontalHeader().setFont(font)
         # 手动设置列宽
-        self.tableWidget.horizontalHeader().resizeSection(0, 400)
-        self.tableWidget.horizontalHeader().resizeSection(1, 100)
-        self.tableWidget.horizontalHeader().resizeSection(2, 100)
+        self.tableWidget.horizontalHeader().resizeSection(0, 500)
+        self.tableWidget.horizontalHeader().resizeSection(1, 50)
+        self.tableWidget.horizontalHeader().resizeSection(2, 50)
         # 设置列宽自适应
         # self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
