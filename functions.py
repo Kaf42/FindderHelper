@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.remote.command import Command
 from configparser import ConfigParser
 
+
 target_url = "https://www.imf.org"
 time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 config = ConfigParser()
@@ -23,6 +24,8 @@ def UrlSniffing(url):
 
     # 2.打开浏览器
     driver = CreateChromeDriver()
+    if not (url.startswith("http") or url.startswith("https")):
+        url = "http://" + url
     driver.get(url)
 
     try:
@@ -91,9 +94,8 @@ def CreateChromeDriver(headless=False):
     options.add_argument('--proxy-server=%s' % proxy_ip)
     # 指定chrome的路径
     options.binary_location = chrome_address
-    service = Service(chromedrive_address)
-    # 创建浏览器对象
-    browser = webdriver.Chrome(service=service, options=options)
+    # # 创建浏览器对象
+    browser = webdriver.Chrome(service=Service(chromedrive_address), options=options)
     # 破解反爬措施
     browser.execute_cdp_cmd(
         'Page.addScriptToEvaluateOnNewDocument',
