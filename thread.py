@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
-from PyQt5.QtCore import QThread, pyqtSignal, QMutex
+from PyQt5.QtCore import QThread, pyqtSignal, QMutex, Qt
 import logging
 
 from PyQt5.QtWidgets import QTableWidgetItem
 
 from functions import UrlSniffing
-import win32clipboard as wcb
-import win32con as wc
 import pyperclip
 
 
@@ -33,7 +31,6 @@ class Thread_Sniffer(QThread):
         except Exception as e:
             print(e)
             return
-        # urls = "www.baidu.com;\nwww.baidu.com111"
         logging.info("抓包完成！")
         logging.info("获取到的网址为：\n" + urls)
         self.finishSignal.emit()
@@ -56,8 +53,11 @@ class Thread_Sniffer(QThread):
         """
         self.tableWidget.insertRow(self.tableWidget.rowCount())
         self.tableWidget.setItem(self.tableWidget.rowCount() - 1, 0, QTableWidgetItem(url))
+        self.tableWidget.item(self.tableWidget.rowCount() - 1, 0).setTextAlignment(Qt.AlignCenter)
         self.tableWidget.setItem(self.tableWidget.rowCount() - 1, 1, QTableWidgetItem(type))
+        self.tableWidget.item(self.tableWidget.rowCount() - 1, 1).setTextAlignment(Qt.AlignCenter)
         self.tableWidget.setItem(self.tableWidget.rowCount() - 1, 2, QTableWidgetItem(status))
+        self.tableWidget.item(self.tableWidget.rowCount() - 1, 2).setTextAlignment(Qt.AlignCenter)
 
 
 # 定义一个线程类
