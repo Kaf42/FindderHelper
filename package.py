@@ -1,51 +1,48 @@
-# coding=utf-8
-
 import os
-import shutil
-# from tool_function import wheel
+import shutil  # 导入移动模块
+
+def zip_dir(dir_path, zip_name):
+    import zipfile
+    zip = zipfile.ZipFile(zip_name + '.zip', "w", zipfile.ZIP_DEFLATED)
+    for path, dirnames, filenames in os.walk(dir_path):
+        # 去掉目标跟路径，只对目标文件夹下边的文件及文件夹进行压缩
+        fpath = path.replace(dir_path, zip_name + '/')
+        for filename in filenames:
+            zip.write(os.path.join(path, filename), os.path.join(fpath, filename))
+    zip.close()
+
+# 创建安装包文件夹
+package_dir = r'./FindderHelper/'
+package_name = 'FindderHelper'
+zip_name = 'FindderHelper'
+try:
+    # pass
+    os.mkdir(package_dir)
+except FileExistsError:
+    # 获取该文件夹下的所有文件名列表
+    file_list = os.listdir(package_dir)
+
+    # 遍历文件列表并删除每个文件
+    for file in file_list:
+        # 构建完整的文件路径
+        file_path = os.path.join(package_dir, file)
+
+        if os.path.isfile(file_path):
+            # 如果是文件则直接删除
+            os.remove(file_path)
+
+# 打包
+os.system(r'D:\Anaconda\Scripts\pyinstaller.exe -F -w -n '+package_name+' WebCrawlerApp.py --distpath ' + package_dir)
+
+# 移动文件
+shutil.copyfile(r'./web_crawler_config.json', package_dir+'/web_crawler_config.json')
+shutil.copyfile(r'./README.md', package_dir+'/README.md')
+shutil.copyfile(r'./proxy_rule.py', package_dir+'/proxy_rule.py')
+# 删除打包文件
+shutil.rmtree(r'./build')
+os.remove(package_name+'.spec')
+
+# # 压缩
+zip_dir(package_dir, zip_name)
 
 
-def main():
-    # 创建安装包文件夹
-    package_dir = r'./FindderHelper_package/'
-    package_name = 'FindderHelper'
-    zip_name = 'FindderHelper_package'
-    try:
-        os.mkdir(package_dir)
-    except FileExistsError:
-        # 获取该文件夹下的所有文件名列表
-        del_file(package_dir)
-
-    # 打包
-    os.system('pyinstaller -F -w -n '+package_name+' main.py'+' --distpath '+package_dir)
-
-    # 移动文件
-    # shutil.copyfile(r'./icnet_publish_data.xlsx', package_dir+'/icnet_publish_data.xlsx')
-    shutil.copyfile(r'./config.ini', package_dir+'/config.ini')
-    shutil.copyfile(r'./readme.md', package_dir+'/readme.md')
-    # shutil.copyfile(r'./icnet_publish.bat', package_dir+'/icnet_publish.bat')
-    shutil.copytree(r'./resource', package_dir+'/resource')
-    # 删除打包文件
-    shutil.rmtree(r'./build')
-    os.remove(package_name+'.spec')
-
-    # # 压缩
-    # wheel.zip_dir(package_dir, zip_name)
-
-
-def del_file(path):
-    if not os.listdir(path):
-        print('目录为空！')
-    else:
-        for i in os.listdir(path):
-            path_file = os.path.join(path, i)  # 取文件绝对路径
-            print(path_file)
-            if os.path.isfile(path_file):
-                os.remove(path_file)
-            else:
-                del_file(path_file)
-                shutil.rmtree(path_file)
-
-
-if __name__ == '__main__':
-    main()

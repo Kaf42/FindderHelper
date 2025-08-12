@@ -1,0 +1,12 @@
+https://baidu.com/
+https://www.baidu.com/
+https://pss.bdstatic.com/
+https://psstatic.cdn.bcebos.com/
+https://hectorstatic.baidu.com/
+https://aisearch.bj.bcebos.com/
+https://sp2.baidu.com/
+https://sp1.baidu.com/
+https://mbd.baidu.com/
+https://gips0.baidu.com/
+https://hector.baidu.com/
+https://passport.baidu.com/

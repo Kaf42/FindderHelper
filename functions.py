@@ -7,23 +7,21 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.remote.command import Command
 from configparser import ConfigParser
 
+from PyQt5.QtWidgets import QTableWidgetItem
+
 
 target_url = "https://www.imf.org"
 time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-config = ConfigParser()
-config.read('config.ini')
-chrome_address = config['Chrome']['chrome_path']
-chromedrive_address = config['Chrome']['chromedriver_path']
 
 
-def UrlSniffing(url):
+def UrlSniffing(url, chrome_address=None, chromedrive_address=None):
     ClearProxyAndChrome()
     # 1.开启代理
     command = "mitmdump -w mitmFile.txt -s proxy_rule.py"
     os.system("start cmd.exe cmd /k " + command)
 
     # 2.打开浏览器
-    driver = CreateChromeDriver()
+    driver = CreateChromeDriver(chrome_address, chromedrive_address)
     if not (url.startswith("http") or url.startswith("https")):
         url = "http://" + url
     driver.get(url)
@@ -70,7 +68,14 @@ def ClearProxyAndChrome():
     os.system("taskkill /f /im chromedriver.exe")
 
 
-def CreateChromeDriver(headless=False):
+def CreateChromeDriver(chrome_address, chromedrive_address, headless=False):
+
+    if chrome_address is None or chrome_address is None:
+        config = ConfigParser()
+        config.read('config.ini')
+        chrome_address = config['Chrome']['chrome_path']
+        chromedrive_address = config['Chrome']['chromedriver_path']
+
     """
     :param headless: 是否无头模式
     :return: 谷歌浏览器

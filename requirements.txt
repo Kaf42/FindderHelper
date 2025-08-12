@@ -1,6 +1,4 @@
-ipython==8.12.3
-mitmproxy==10.3.0
+mitmproxy
 pyperclip==1.8.2
-PyQt5==5.15.10
-PyQt5_sip==12.13.0
-selenium==4.19.0
+PyQt5==5.8.2
+selenium==4.21.0
