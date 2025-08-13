@@ -10,7 +10,6 @@ import json
 import os
 import pyperclip
 from functions import UrlSniffing
-from PIL import Image, ImageTk
 
 
 class WebCrawlerApp:
